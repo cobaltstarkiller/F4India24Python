@@ -1,5 +1,6 @@
 import pandas as pd
 import matplotlib.pyplot as plt
+import numpy as np
 
 # Step 1: Load the metadata (first 14 rows) and telemetry (rest) separately
 file_path = 'Jaden Pariat Round 3 Race 1 Telemetry.csv'
@@ -9,13 +10,19 @@ metadata_df = pd.read_csv(file_path, nrows=14, header=None, engine='python')
 
 # Load the telemetry data (from row 15 onwards)
 telemetry_df = pd.read_csv(file_path, skiprows=14, low_memory=False)
+# Load the CSV file
+telemetry_df = pd.read_csv(file_path, skiprows=14, low_memory=False)
 
-# del_df = [2,3]
-# telemetry_df = telemetry_df.drop(index=metadata_df.index[del_df])
-# telemetry_df.head()
+# Convert all columns to numeric where possible, coercing errors to NaN
+for col in telemetry_df.columns:
+    telemetry_df[col] = pd.to_numeric(telemetry_df[col], errors='coerce')
+
+# Proceed with the rest of your code
+del_df = [2, 3]  # Adjust the columns to be deleted as needed
+telemetry_df = telemetry_df.drop(index=metadata_df.index[del_df])
 
 # Extract vehicle number and driver's name from the metadata dataframe
-# championship = metadata_df.iloc[2, 1]
+championship = metadata_df.iloc[2, 1]
 vehicle_number = metadata_df.iloc[2, 1]  # Vehicle number is in row 3 (index 2) and column 2 (index 1)
 driver_name = metadata_df.iloc[3, 1]  # Driver's name is in row 4 (index 3) and column 2 (index 1)
 
