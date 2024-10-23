@@ -1,5 +1,4 @@
 *.sqlite
-*.pyd
 etc/
 Include/
 Lib/
