@@ -94,11 +94,11 @@ def generate_plot():
     telemetry_FL_car2 = classify_actions(telemetry_FL_car2)
 
     # Extract driver and vehicle information
-    driver_name_car1 = metadata_df_car1.iloc[3, 1]  # Assuming 'Racer' is the first row
-    car_number_car1 = metadata_df_car1.iloc[2, 1]  # Assuming 'Vehicle' is the second row
+    driver_name_car1 = metadata_df_car1.iloc[3, 1]  # Assuming 'Racer' is the 4th row
+    car_number_car1 = metadata_df_car1.iloc[2, 1]  # Assuming 'Vehicle' is the 3rd row
 
-    driver_name_car2 = metadata_df_car2.iloc[3, 1]  # Assuming 'Racer' is the first row
-    car_number_car2 = metadata_df_car2.iloc[2, 1]  # Assuming 'Vehicle' is the second row
+    driver_name_car2 = metadata_df_car2.iloc[3, 1]  # Assuming 'Racer' is the 4th row
+    car_number_car2 = metadata_df_car2.iloc[2, 1]  # Assuming 'Vehicle' is the 3rd row
 
     # Create subplots with shared x-axis
     fig = make_subplots(rows=3, cols=1, shared_xaxes=True, 
