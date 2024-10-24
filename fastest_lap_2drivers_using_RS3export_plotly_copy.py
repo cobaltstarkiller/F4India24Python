@@ -35,7 +35,7 @@ def get_fastest_lap_data(metadata_df, telemetry_df):
     
     # Calculate start and end timestamps for the fastest lap
     fastest_lap_time = min(laps_array)
-    fastest_lap_index = laps_array.index(fastest_lap_time)
+    fastest_lap_index = segment_times.index(fastest_lap_time)
     
     start_time_stamp = sum(segment_times[:fastest_lap_index])
     end_time_stamp = sum(segment_times[:fastest_lap_index + 1])
@@ -92,6 +92,10 @@ def generate_plot():
     # Classify actions for both cars
     telemetry_FL_car1 = classify_actions(telemetry_FL_car1)
     telemetry_FL_car2 = classify_actions(telemetry_FL_car2)
+    
+    # Save data for debugging
+    telemetry_FL_car1.to_csv('car1_actions_plotly.csv', index=False)
+    telemetry_FL_car2.to_csv('car2_actions_plotly.csv', index=False)
 
     # Extract driver and vehicle information
     driver_name_car1 = metadata_df_car1.iloc[3, 1]  # Assuming 'Racer' is the 4th row

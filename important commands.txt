@@ -1,0 +1,24 @@
+git init
+
+git config --global user.name “[firstname lastname]”
+
+git config --global user.email “[valid-email]”
+
+git branch -m [branch name] (often used branch - main)
+
+git remote add [alias] [url] (often used alias - origin)
+
+git remote -v (to check status of remote fetch and push)
+
+git add . (to add all the files within the working directory to be tracked)
+
+git commit -m "replace with message between quotes"
+
+git push [alias] [branch]
+
+pip freeze > requirements.txt
+
+prompt for fastest lap logic from RS3 data = the way you are isolating the fastest lap telemetry data is completely wrong
+to calculate the starting time stamp of the fastest lap in the time col, take the sum of all the segment times from the start till the one segment time just before it. 
+to calculate the ending time stamp of the fastest lap in the time col, just take the sum of all the segment times from the start till the fastest lap time including.
+now cut the telemetry data using the before timestamps and save it in telemetry_FL dataframe for both the drivers data
