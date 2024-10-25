@@ -44,8 +44,8 @@ def get_fastest_lap_data(metadata_df, telemetry_df):
     telemetry_FL = telemetry_df[(telemetry_df['Time'] >= start_time_stamp) & (telemetry_df['Time'] <= end_time_stamp)]
     
     # Adjust the distance calculation to be relative to the start of the fastest lap
-    start_distance = telemetry_FL['Distance on GPS Speed'].iloc[0]
-    telemetry_FL['Distance'] = telemetry_FL['Distance on GPS Speed'] - start_distance
+    start_distance = telemetry_FL['Distance on Vehicle Speed'].iloc[0]
+    telemetry_FL['Distance'] = telemetry_FL['Distance on Vehicle Speed'] - start_distance
     
     return telemetry_FL
 
