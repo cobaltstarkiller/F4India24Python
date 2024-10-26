@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 import plotly.graph_objects as go
+import plotly.io as pio
 from tkinter import Tk
 from tkinter.filedialog import askopenfilename
 
@@ -59,10 +60,10 @@ def generate_track_map(telemetry_FL_1, telemetry_FL_2, driver_1, car_1, driver_2
         lat=telemetry_FL_1['GPS Latitude'],
         mode='lines',
         name=f'{driver_1} #({car_1})',
-        line=dict(width=2, color='blue'),
+        line=dict(width=4, color='blue'),
         hoverinfo='text',
         text=[
-            f"Speed: {speed} km/h<br>Lat: {lat}<br>Lon: {lon}"
+            f"{driver_1} Speed: {speed} km/h<br>Lat: {lat}<br>Lon: {lon}"
             for speed, lat, lon in zip(
                 telemetry_FL_1['Speed'], 
                 telemetry_FL_1['GPS Latitude'], 
@@ -77,10 +78,10 @@ def generate_track_map(telemetry_FL_1, telemetry_FL_2, driver_1, car_1, driver_2
         lat=telemetry_FL_2['GPS Latitude'],
         mode='lines',
         name=f'{driver_2} #({car_2})',
-        line=dict(width=2, color='red'),
+        line=dict(width=4, color='red'),
         hoverinfo='text',
         text=[
-            f"Speed: {speed} km/h<br>Lat: {lat}<br>Lon: {lon}"
+            f"{driver_2} Speed: {speed} km/h<br>Lat: {lat}<br>Lon: {lon}"
             for speed, lat, lon in zip(
                 telemetry_FL_2['Speed'], 
                 telemetry_FL_2['GPS Latitude'], 
@@ -91,10 +92,11 @@ def generate_track_map(telemetry_FL_1, telemetry_FL_2, driver_1, car_1, driver_2
 
     # Update layout
     fig.update_layout(
-        mapbox_style="open-street-map",
         mapbox=dict(
+            style="carto-darkmatter",
             center=dict(lat=telemetry_FL_1['GPS Latitude'].mean(), lon=telemetry_FL_1['GPS Longitude'].mean()),
-            zoom=16
+            zoom=16,
+            accesstoken="sk.eyJ1Ijoib2Z0ZW4tY2FsbGVkLXBrIiwiYSI6ImNtMnFtd3ZveTB3aWIybHNiMmJvYjVubjcifQ.FGH6BkG6vZgFF0dMCYovjg", 
         ),
         title="Track Map Comparison: Fastest Lap",
         margin={"r":0,"t":0,"l":0,"b":0}
