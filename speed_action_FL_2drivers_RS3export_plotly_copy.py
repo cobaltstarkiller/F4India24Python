@@ -76,6 +76,21 @@ def select_files():
     
     return file_path_car1, file_path_car2
 
+def normalize_and_calculate_delta(telemetry_FL_car1, telemetry_FL_car2):
+    # Normalize time to start from zero for both drivers
+    telemetry_FL_car1['Normalized Time'] = telemetry_FL_car1['Time'] - telemetry_FL_car1['Time'].iloc[0]
+    telemetry_FL_car2['Normalized Time'] = telemetry_FL_car2['Time'] - telemetry_FL_car2['Time'].iloc[0]
+    
+    # Interpolating time over distance for alignment
+    car1_interp = pd.Series(telemetry_FL_car1['Normalized Time'].values, index=telemetry_FL_car1['Distance']).reindex(
+        telemetry_FL_car2['Distance'], method="nearest"
+    )
+    car2_interp = pd.Series(telemetry_FL_car2['Normalized Time'].values, index=telemetry_FL_car2['Distance'])
+    
+    # Calculating the time delta (car2 - car1)
+    lap_delta = car2_interp - car1_interp
+    return lap_delta
+
 # Main function to generate plot
 def generate_plot():
     # Select files
@@ -93,38 +108,41 @@ def generate_plot():
     telemetry_FL_car1 = classify_actions(telemetry_FL_car1)
     telemetry_FL_car2 = classify_actions(telemetry_FL_car2)
     
-    # Save data for debugging
-    telemetry_FL_car1.to_csv('car1_actions_plotly.csv', index=False)
-    telemetry_FL_car2.to_csv('car2_actions_plotly.csv', index=False)
-
+    # Calculate lap delta
+    lap_delta = normalize_and_calculate_delta(telemetry_FL_car1, telemetry_FL_car2)
+    
     # Extract driver and vehicle information
-    driver_name_car1 = metadata_df_car1.iloc[3, 1]  # Assuming 'Racer' is the 4th row
-    car_number_car1 = metadata_df_car1.iloc[2, 1]  # Assuming 'Vehicle' is the 3rd row
-
-    driver_name_car2 = metadata_df_car2.iloc[3, 1]  # Assuming 'Racer' is the 4th row
-    car_number_car2 = metadata_df_car2.iloc[2, 1]  # Assuming 'Vehicle' is the 3rd row
+    driver_name_car1 = metadata_df_car1.iloc[3, 1]
+    driver_name_car2 = metadata_df_car2.iloc[3, 1]
 
     # Create subplots with shared x-axis
-    fig = make_subplots(rows=3, cols=1, shared_xaxes=True, 
+    fig = make_subplots(rows=4, cols=1, shared_xaxes=True, 
                         subplot_titles=[f"{driver_name_car1} vs {driver_name_car2} Speed",
+                                        "Lap Delta (Time Difference)",
                                         f"{driver_name_car1} Actions",
                                         f"{driver_name_car2} Actions"],
-                        row_heights=[0.5, 0.25, 0.25], vertical_spacing=0.1)
+                        row_heights=[0.4, 0.2, 0.2, 0.2], vertical_spacing=0.05)
     
     # Speed plot (top)
-    fig.add_trace(go.Scatter(x=telemetry_FL_car1['Distance'], y=telemetry_FL_car1['GPS Speed'],
-                             mode='lines', name=f'{driver_name_car1} Speed', line=dict(color='cyan')),
+    fig.add_trace(go.Scatter(x=telemetry_FL_car1['Distance'], y=telemetry_FL_car1['Speed'],
+                             mode='lines', name=f'{driver_name_car1} Speed', line=dict(color='orange')),
                   row=1, col=1)
-    fig.add_trace(go.Scatter(x=telemetry_FL_car2['Distance'], y=telemetry_FL_car2['GPS Speed'],
-                             mode='lines', name=f'{driver_name_car2} Speed', line=dict(color='orange')),
+    fig.add_trace(go.Scatter(x=telemetry_FL_car2['Distance'], y=telemetry_FL_car2['Speed'],
+                             mode='lines', name=f'{driver_name_car2} Speed', line=dict(color='cyan')),
                   row=1, col=1)
-    
+
+    # Lap Delta plot (second row)
+    fig.add_trace(go.Scatter(x=telemetry_FL_car2['Distance'], y=lap_delta,
+                             mode='lines', name=f'Delta ({driver_name_car2})', line=dict(color='cyan')),
+                  row=2, col=1)
+    fig.add_trace(go.Scatter(x=telemetry_FL_car2['Distance'], y=[0] * len(telemetry_FL_car2['Distance']),
+                             mode='lines', name='Zero Reference', line=dict(color='gray', dash='dash')),
+                  row=2, col=1)
+
     # Define action colors
     action_colors = {'Brake': 'red', 'Full Throttle': 'green', 'Turning': 'yellow'}
-
-    # Track which actions have already been added to the legend
     legend_added = {'Brake': False, 'Full Throttle': False, 'Turning': False}
-    
+
     # Function to plot action bars with constant height
     def plot_action_bars(telemetry_data, driver_name, row_idx):
         action_changes = telemetry_data['Action'].ne(telemetry_data['Action'].shift()).cumsum()
@@ -134,38 +152,38 @@ def generate_plot():
         for _, group in grouped_actions:
             action_type = group['Action'].iloc[0]
             color = action_colors[action_type]
-            # Only show legend for the first occurrence of each action
             show_legend = not legend_added[action_type]
             if show_legend:
                 legend_added[action_type] = True
             
             fig.add_trace(go.Bar(x=[group['Distance'].max() - group['Distance'].min()], 
-                             y=[driver_name],  # Keep y-value constant
+                             y=[driver_name],  # Constant y-value
                              marker_color=color,
-                             width=[100],
+                             width=[50],
                              base=group['Distance'].min(), 
                              orientation='h', name=f'{action_type}' if show_legend else None,
-                             showlegend=show_legend),  # Control legend visibility
+                             showlegend=show_legend),
                       row=row_idx, col=1)
 
     # Plot action bars for the first car
-    plot_action_bars(telemetry_FL_car1, driver_name_car1, 2)
+    plot_action_bars(telemetry_FL_car1, driver_name_car1, 3)
 
     # Plot action bars for the second car
-    plot_action_bars(telemetry_FL_car2, driver_name_car2, 3)
+    plot_action_bars(telemetry_FL_car2, driver_name_car2, 4)
     
-    # Update layout to match the dark theme and style, set font color to white
-    fig.update_layout(height=900, width=2000, title_text="Telemetry Data Comparison: Fastest Lap",
-                      paper_bgcolor='black', plot_bgcolor='black',
+    # Update layout
+    fig.update_layout(height=1200, width=2000, title_text="Telemetry Data Comparison: Fastest Lap",
+                      template="plotly_dark",
                       font=dict(color='white'),
-                      showlegend=True,  # Enable legend display
-                      legend=dict(font=dict(color='white')))  # Set legend font color to white
+                      showlegend=True,
+                      legend=dict(font=dict(color='white')))
     
-    # Set axes title font color to white
-    fig.update_xaxes(title_text="Distance (m)", row=3, col=1, title_font=dict(color='white'), tickfont=dict(color='white'))
+    # Set axis titles and colors
+    fig.update_xaxes(title_text="Distance (m)", row=4, col=1, title_font=dict(color='white'), tickfont=dict(color='white'))
     fig.update_yaxes(title_text="Speed (km/h)", row=1, col=1, title_font=dict(color='white'), tickfont=dict(color='white'))
+    fig.update_yaxes(title_text="Time Delta (s)", row=2, col=1, title_font=dict(color='white'), tickfont=dict(color='white'))
     
-    # Set subplot title font color to white
+    # Set subplot title font color
     fig.update_annotations(font=dict(color='white'))
 
     # Show the plot

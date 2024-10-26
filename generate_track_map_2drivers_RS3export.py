@@ -43,8 +43,8 @@ def get_fastest_lap_data(metadata_df, telemetry_df):
     telemetry_FL = telemetry_df[(telemetry_df['Time'] >= start_time_stamp) & (telemetry_df['Time'] <= end_time_stamp)]
     
     # Adjust the distance calculation to be relative to the start of the fastest lap
-    start_distance = telemetry_FL['Distance on GPS Speed'].iloc[0]
-    telemetry_FL['Distance'] = telemetry_FL['Distance on GPS Speed'] - start_distance
+    start_distance = telemetry_FL['Distance on Vehicle Speed'].iloc[0]
+    telemetry_FL['Distance'] = telemetry_FL['Distance on Vehicle Speed'] - start_distance
     
     return telemetry_FL
 
@@ -53,23 +53,41 @@ def generate_track_map(telemetry_FL_1, telemetry_FL_2, driver_1, car_1, driver_2
     # Create figure
     fig = go.Figure()
 
-    # Plot Driver 1 track
+    # Plot Driver 1 track with latitude and longitude in hover text
     fig.add_trace(go.Scattermapbox(
-        lon=telemetry_FL_1['GPS Longitude'], lat=telemetry_FL_1['GPS Latitude'],
+        lon=telemetry_FL_1['GPS Longitude'], 
+        lat=telemetry_FL_1['GPS Latitude'],
         mode='lines',
-        name=f'{driver_1} ({car_1})',
+        name=f'{driver_1} #({car_1})',
         line=dict(width=2, color='blue'),
         hoverinfo='text',
-        text=telemetry_FL_1['Speed']))
+        text=[
+            f"Speed: {speed} km/h<br>Lat: {lat}<br>Lon: {lon}"
+            for speed, lat, lon in zip(
+                telemetry_FL_1['Speed'], 
+                telemetry_FL_1['GPS Latitude'], 
+                telemetry_FL_1['GPS Longitude']
+            )
+        ]
+    ))
 
-    # Plot Driver 2 track
+    # Plot Driver 2 track with latitude and longitude in hover text
     fig.add_trace(go.Scattermapbox(
-        lon=telemetry_FL_2['GPS Longitude'], lat=telemetry_FL_2['GPS Latitude'],
+        lon=telemetry_FL_2['GPS Longitude'], 
+        lat=telemetry_FL_2['GPS Latitude'],
         mode='lines',
-        name=f'{driver_2} ({car_2})',
+        name=f'{driver_2} #({car_2})',
         line=dict(width=2, color='red'),
         hoverinfo='text',
-        text=telemetry_FL_2['Speed']))
+        text=[
+            f"Speed: {speed} km/h<br>Lat: {lat}<br>Lon: {lon}"
+            for speed, lat, lon in zip(
+                telemetry_FL_2['Speed'], 
+                telemetry_FL_2['GPS Latitude'], 
+                telemetry_FL_2['GPS Longitude']
+            )
+        ]
+    ))
 
     # Update layout
     fig.update_layout(
