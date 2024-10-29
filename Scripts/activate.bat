@@ -8,7 +8,7 @@ if defined _OLD_CODEPAGE (
     "%SystemRoot%\System32\chcp.com" 65001 > nul
 )
 
-set VIRTUAL_ENV=E:\Python Projects\F4 India 2024 Python Scripts\F4India24Python
+set VIRTUAL_ENV=D:\Python Projects\F4India24Python
 
 if not defined PROMPT set PROMPT=$P$G
 
