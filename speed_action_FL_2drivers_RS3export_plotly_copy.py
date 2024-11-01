@@ -172,7 +172,7 @@ def generate_plot():
     plot_action_bars(telemetry_FL_car2, driver_name_car2, 4)
     
     # Update layout
-    fig.update_layout(height=1200, width=2000, title_text="Telemetry Data Comparison: Fastest Lap",
+    fig.update_layout(height=80, width=1480, title_text="Telemetry Data Comparison: Fastest Lap",
                       template="plotly_dark",
                       font=dict(color='white'),
                       showlegend=True,

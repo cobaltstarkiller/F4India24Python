@@ -1,8 +1,8 @@
 git init
 
-git config --global user.name “[firstname lastname]”
+git config --global user.name ï¿½[firstname lastname]ï¿½
 
-git config --global user.email “[valid-email]”
+git config --global user.email ï¿½[valid-email]ï¿½
 
 git branch -m [branch name] (often used branch - main)
 
