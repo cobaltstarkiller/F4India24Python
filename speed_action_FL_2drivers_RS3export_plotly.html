@@ -5,16 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Telemetry Data Comparison</title>
 
-    <!-- Embed PapaParse code directly into HTML -->
-    <script>
-        // PapaParse library embedded directly
-        /*! PapaParse v5.3.0 | https://github.com/mholt/PapaParse */
-        /* (Complete library code goes here) */
-        // Copy the entire content of papaparse.min.js here.
-        </script>
+    <!-- Embed PapaParse and d3 script into HTML -->    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
 
     <!-- Load Plotly library from CDN -->
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+
 </head>
 <body>
     <h2>Telemetry Data Comparison Tool</h2>
@@ -34,6 +31,8 @@
                 console.error("PapaParse is not defined. Script execution halted.");
                 alert("PapaParse is not loaded correctly.");
                 return;
+            } else {
+                console.log("PapaParse is loaded correctly.");
             }
 
             let metadataCar1, telemetryCar1, metadataCar2, telemetryCar2;
@@ -178,17 +177,32 @@
                 }
 
                 try {
+                    console.log("here1");
                     const [fileData1, fileData2] = await Promise.all([loadData(fileInputCar1), loadData(fileInputCar2)]);
                     [metadataCar1, telemetryCar1] = fileData1;
                     [metadataCar2, telemetryCar2] = fileData2;
 
+                    
+                    console.log("here2");
+
                     const fastestLapCar1 = getFastestLapData(metadataCar1, telemetryCar1);
                     const fastestLapCar2 = getFastestLapData(metadataCar2, telemetryCar2);
 
+                    
+                    console.log("here3");
+
                     classifyActions(fastestLapCar1);
+
+
+                    console.log("here3.5");
                     classifyActions(fastestLapCar2);
 
+
+                    console.log("here4");
+
                     const lapDelta = normalizeAndCalculateDelta(fastestLapCar1, fastestLapCar2);
+
+                    console.log("here5");
 
                     generatePlot(fastestLapCar1, fastestLapCar2, lapDelta, metadataCar1[3][1] || "Car 1", metadataCar2[3][1] || "Car 2");
                 } catch (error) {
